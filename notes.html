@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список заметок</title>
+    <script>
+        async function loadNotes() {
+            const response = await fetch('/notes');
+            const notes = await response.json();
+            const list = document.getElementById('notesList');
+            list.innerHTML = '';
+            notes.forEach(note => {
+                const li = document.createElement('li');
+                li.textContent = note.text + ' ';
+                const btn = document.createElement('button');
+                btn.textContent = 'Удалить';
+                btn.onclick = async () => {
+                    await fetch('/notes/' + note.id, { method: 'DELETE' });
+                    loadNotes();
+                };
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+        window.onload = loadNotes;
+    </script>
+</head>
+<body>
+    <h1>Список заметок</h1>
+    <ul id="notesList"></ul>
+    <a href="/">Назад</a>
+</body>
+</html>

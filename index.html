@@ -1,8 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head><title>Заметки</title></head>
+<head>
+    <title>Заметки</title>
+    <script>
+        async function addNote() {
+            const text = document.getElementById('noteText').value;
+            if (!text) return;
+            const response = await fetch('/notes?text=' + encodeURIComponent(text), {
+                method: 'POST'
+            });
+            if (response.ok) {
+                document.getElementById('noteText').value = '';
+                alert('Заметка добавлена!');
+            } else {
+                alert('Ошибка при добавлении заметки');
+            }
+        }
+    </script>
+</head>
 <body>
     <h1>Добро пожаловать!</h1>
-    <a href="/notes">Посмотреть заметки</a>
+    <a href="/notes-page">Посмотреть заметки</a>
+    <h2>Добавить заметку</h2>
+    <input type="text" id="noteText" placeholder="Текст заметки">
+    <button onclick="addNote()">Добавить</button>
 </body>
 </html>
