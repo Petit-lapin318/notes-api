@@ -27,6 +27,14 @@ def delete_note(note_id: int):
             return {"result": "deleted"}
     raise HTTPException(status_code=404, detail="Note not found")
 
+@app.put("/notes/{note_id}")
+def update_note(note_id: int, text: str):
+    for note in notes:
+        if note["id"] == note_id:
+            note["text"] = text
+            return {"id": note_id, "text": text}
+    raise HTTPException(status_code=404, detail="Note not found")
+
 @app.get("/")
 def read_root():
     return FileResponse("index.html")

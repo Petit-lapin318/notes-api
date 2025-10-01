@@ -11,13 +11,37 @@
             notes.forEach(note => {
                 const li = document.createElement('li');
                 li.textContent = note.text + ' ';
-                const btn = document.createElement('button');
-                btn.textContent = 'Удалить';
-                btn.onclick = async () => {
+
+                // Кнопка "Удалить"
+                const btnDelete = document.createElement('button');
+                btnDelete.textContent = 'Удалить';
+                btnDelete.onclick = async () => {
                     await fetch('/notes/' + note.id, { method: 'DELETE' });
                     loadNotes();
                 };
-                li.appendChild(btn);
+                li.appendChild(btnDelete);
+
+                // Кнопка "Редактировать"
+                const btnEdit = document.createElement('button');
+                btnEdit.textContent = 'Редактировать';
+                btnEdit.onclick = () => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = note.text;
+                    const saveBtn = document.createElement('button');
+                    saveBtn.textContent = 'Сохранить';
+                    saveBtn.onclick = async () => {
+                        await fetch('/notes/' + note.id + '?text=' + encodeURIComponent(input.value), {
+                            method: 'PUT'
+                        });
+                        loadNotes();
+                    };
+                    li.innerHTML = '';
+                    li.appendChild(input);
+                    li.appendChild(saveBtn);
+                };
+                li.appendChild(btnEdit);
+
                 list.appendChild(li);
             });
         }
