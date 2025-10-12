@@ -1,39 +1,54 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import List
+import db
 
 app = FastAPI()
-
-# Статика теперь доступна по /static
 app.mount("/static", StaticFiles(directory=".", html=True), name="static")
+# Pydantic-модели
+class NoteBase(BaseModel):
+    text: str
 
-notes = [{"id": 1, "text": "Первая заметка"}]
 
-@app.get("/notes")
+class Note(NoteBase):
+    id: int
+
+
+# Инициализация БД при старте
+@app.on_event("startup")
+def startup_event():
+    db.init_db()
+
+# получить все заметки
+@app.get("/notes", response_model=List[Note])
 def get_notes():
-    return notes
+    rows = db.get_all_notes()
+    return rows
 
-@app.post("/notes")
-def create_note(text: str):
-    new_id = max(note["id"] for note in notes) + 1 if notes else 1
-    notes.append({"id": new_id, "text": text})
-    return {"id": new_id, "text": text}
+# создать заметку — принимаем JSON тело
+@app.post("/notes", response_model=Note)
+def create_note(payload: NoteBase):
+    # Accept JSON only
+    content = payload.text
+    new = db.create_note(content)
+    return new
 
 @app.delete("/notes/{note_id}")
 def delete_note(note_id: int):
-    for i, note in enumerate(notes):
-        if note["id"] == note_id:
-            notes.pop(i)
-            return {"result": "deleted"}
+    ok = db.delete_note(note_id)
+    if ok:
+        return {"result": "deleted"}
     raise HTTPException(status_code=404, detail="Note not found")
 
-@app.put("/notes/{note_id}")
-def update_note(note_id: int, text: str):
-    for note in notes:
-        if note["id"] == note_id:
-            note["text"] = text
-            return {"id": note_id, "text": text}
-    raise HTTPException(status_code=404, detail="Note not found")
+@app.put("/notes/{note_id}", response_model=Note)
+def update_note(note_id: int, payload: NoteBase):
+    content = payload.text
+    updated = db.update_note(note_id, content)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return updated
 
 @app.get("/")
 def read_root():

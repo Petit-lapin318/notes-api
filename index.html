@@ -6,12 +6,15 @@
         async function addNote() {
             const text = document.getElementById('noteText').value;
             if (!text) return;
-            const response = await fetch('/notes?text=' + encodeURIComponent(text), {
-                method: 'POST'
+            const response = await fetch('/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
             });
             if (response.ok) {
                 document.getElementById('noteText').value = '';
-                alert('Заметка добавлена!');
+                // перейти на страницу списка заметок
+                window.location.href = '/notes-page';
             } else {
                 alert('Ошибка при добавлении заметки');
             }

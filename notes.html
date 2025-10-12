@@ -31,8 +31,10 @@
                     const saveBtn = document.createElement('button');
                     saveBtn.textContent = 'Сохранить';
                     saveBtn.onclick = async () => {
-                        await fetch('/notes/' + note.id + '?text=' + encodeURIComponent(input.value), {
-                            method: 'PUT'
+                        await fetch('/notes/' + note.id, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: input.value })
                         });
                         loadNotes();
                     };
