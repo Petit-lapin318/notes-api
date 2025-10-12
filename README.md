@@ -5,7 +5,6 @@
 ## Быстрый запуск (Windows PowerShell)
 1. (Опционально) активировать виртуальное окружение, если есть или создать новое:
 
-```powershell
 # если venv уже есть
 .\venv\Scripts\Activate.ps1
 
@@ -32,19 +31,6 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 - Страница заметок: http://127.0.0.1:8000/notes-page
 - API: http://127.0.0.1:8000/notes
 
-## Быстрая проверка (smoke-test)
-В PowerShell:
-
-```powershell
-# получить список заметок
-iwr http://127.0.0.1:8000/notes | ConvertFrom-Json
-
-# добавить заметку
-iwr -Method POST "http://127.0.0.1:8000/notes?text=Тестовая%20заметка"
-
-# удалить заметку (пример id=1)
-iwr -Method DELETE "http://127.0.0.1:8000/notes/1"
-```
 
 ## Что можно сделать
 - Просматривать список заметок
